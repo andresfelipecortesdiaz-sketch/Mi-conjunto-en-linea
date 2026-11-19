@@ -35,11 +35,9 @@ También preparé un seed de desarrollo con tres torres, los 240 apartamentos, e
 
 ## Estado actual
 
-La interfaz y las rutas principales están implementadas. Para que se pueda probar sin instalar PostgreSQL, adapté la configuración local a SQLite. Ya apliqué la migración, cargué las cuentas de demostración y comprobé el inicio de sesión y el catálogo de torres, apartamentos y zonas. También pasan TypeScript, lint, tres pruebas unitarias y el build.
+La aplicación usa SQLite mediante Prisma y guarda los datos localmente en `prisma/dev.db`. Ya apliqué la migración y ejecuté el seed con las tres torres, los 240 apartamentos, las dos zonas comunes y las cuentas de demostración. Comprobé el inicio de sesión de la administradora y la consulta del catálogo: la respuesta incluyó 3 torres, 240 apartamentos y 2 zonas comunes.
 
-El encargo original solicita PostgreSQL; SQLite es una adaptación para poder ejecutar y mostrar el proyecto localmente con rapidez. Si la entrega exige PostgreSQL, todavía habrá que volver a ese proveedor y probar la migración correspondiente. La importación de residentes desde CSV, algunas herramientas administrativas y las pruebas completas de los módulos siguen pendientes, así que aún no considero esta versión lista para uso real o producción.
-
-En la [trazabilidad del proyecto](docs/TRAZABILIDAD.md) registro el avance de cada fase, las historias de usuario y las verificaciones realizadas.
+La interfaz y las rutas principales de paquetería, reservas, PQRS, bitácora y reportes están implementadas. También pasan la comprobación de TypeScript, lint, las tres pruebas unitarias y la compilación de producción. Todavía falta probar de extremo a extremo todos los recorridos; la importación CSV y algunas pantallas administrativas siguen pendientes. Registro el detalle de lo implementado y probado en la [trazabilidad del proyecto](docs/TRAZABILIDAD.md).
 
 ## Requisitos
 
