@@ -1,0 +1,236 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMINISTRADORA
+  PORTERO
+  RESIDENTE
+}
+
+enum PackageStatus {
+  RECIBIDO
+  ENTREGADO
+}
+
+enum ReservationStatus {
+  PENDIENTE
+  APROBADA
+  RECHAZADA
+  CANCELADA
+}
+
+enum PQRSKind {
+  PETICION
+  QUEJA
+  RECLAMO
+  SUGERENCIA
+}
+
+enum PQRSStatus {
+  RECIBIDA
+  EN_REVISION
+  RESPONDIDA
+  CERRADA
+}
+
+enum Priority {
+  BAJA
+  MEDIA
+  ALTA
+  URGENTE
+}
+
+model User {
+  id                   String            @id @default(cuid())
+  name                 String
+  email                String            @unique
+  passwordHash         String
+  role                 Role
+  active               Boolean           @default(true)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  profile              ResidentProfile?
+  receivedPackages     Package[]         @relation("PackageRecorder")
+  deliveries           PackageDelivery[]
+  reservations         Reservation[]
+  pqrs                 PQRS[]
+  pqrsHistory          PQRSHistory[]
+  auditLogs            AuditLog[]
+  novelties            ShiftNovelty[]
+  approvedReservations Reservation[]     @relation("ReservationApprover")
+
+  @@index([role, active])
+}
+
+model Tower {
+  id         String      @id @default(cuid())
+  name       String      @unique
+  apartments Apartment[]
+  createdAt  DateTime    @default(now())
+}
+
+model Apartment {
+  id           String            @id @default(cuid())
+  number       String
+  towerId      String
+  tower        Tower             @relation(fields: [towerId], references: [id], onDelete: Restrict)
+  residents    ResidentProfile[]
+  packages     Package[]
+  reservations Reservation[]
+  createdAt    DateTime          @default(now())
+
+  @@unique([towerId, number])
+  @@index([number])
+}
+
+model ResidentProfile {
+  id               String             @id @default(cuid())
+  userId           String             @unique
+  apartmentId      String
+  phone            String?
+  consentAt        DateTime?
+  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  apartment        Apartment          @relation(fields: [apartmentId], references: [id], onDelete: Restrict)
+  authorizedPeople AuthorizedPerson[]
+
+  @@index([apartmentId])
+}
+
+model Package {
+  id             String           @id @default(cuid())
+  apartmentId    String
+  recipientName  String
+  carrier        String
+  trackingNumber String?
+  description    String?
+  observations   String?
+  status         PackageStatus    @default(RECIBIDO)
+  receivedAt     DateTime         @default(now())
+  recordedById   String
+  apartment      Apartment        @relation(fields: [apartmentId], references: [id], onDelete: Restrict)
+  recordedBy     User             @relation("PackageRecorder", fields: [recordedById], references: [id], onDelete: Restrict)
+  delivery       PackageDelivery?
+
+  @@index([apartmentId, status, receivedAt])
+  @@index([receivedAt, status])
+}
+
+model PackageDelivery {
+  id            String   @id @default(cuid())
+  packageId     String   @unique
+  receiverName  String
+  receiverType  String
+  observations  String?
+  deliveredAt   DateTime @default(now())
+  deliveredById String
+  package       Package  @relation(fields: [packageId], references: [id], onDelete: Restrict)
+  deliveredBy   User     @relation(fields: [deliveredById], references: [id], onDelete: Restrict)
+}
+
+model AuthorizedPerson {
+  id                String          @id @default(cuid())
+  residentProfileId String
+  name              String
+  documentLast4     String?
+  active            Boolean         @default(true)
+  residentProfile   ResidentProfile @relation(fields: [residentProfileId], references: [id], onDelete: Cascade)
+
+  @@index([residentProfileId, active])
+}
+
+model CommonArea {
+  id           String        @id @default(cuid())
+  name         String        @unique
+  capacity     Int
+  schedule     Json
+  reservations Reservation[]
+}
+
+model Reservation {
+  id              String            @id @default(cuid())
+  commonAreaId    String
+  apartmentId     String
+  userId          String
+  date            DateTime          @db.Date
+  slot            String
+  attendees       Int
+  status          ReservationStatus @default(PENDIENTE)
+  rejectionReason String?
+  approvedById    String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  commonArea      CommonArea        @relation(fields: [commonAreaId], references: [id], onDelete: Restrict)
+  apartment       Apartment         @relation(fields: [apartmentId], references: [id], onDelete: Restrict)
+  user            User              @relation(fields: [userId], references: [id], onDelete: Restrict)
+  approvedBy      User?             @relation("ReservationApprover", fields: [approvedById], references: [id], onDelete: Restrict)
+
+  @@index([commonAreaId, date, slot, status])
+  @@index([apartmentId, date])
+}
+
+model PQRS {
+  id          String        @id @default(cuid())
+  ticket      String        @unique
+  userId      String
+  kind        PQRSKind
+  subject     String
+  description String
+  status      PQRSStatus    @default(RECIBIDA)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  user        User          @relation(fields: [userId], references: [id], onDelete: Restrict)
+  history     PQRSHistory[]
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}
+
+model PQRSHistory {
+  id        String     @id @default(cuid())
+  pqrsId    String
+  userId    String
+  status    PQRSStatus
+  message   String
+  createdAt DateTime   @default(now())
+  pqrs      PQRS       @relation(fields: [pqrsId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([pqrsId, createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  entity    String
+  entityId  String
+  metadata  Json?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([entity, entityId, createdAt])
+  @@index([userId, createdAt])
+}
+
+model ShiftNovelty {
+  id           String    @id @default(cuid())
+  authorId     String
+  category     String
+  description  String
+  shift        String
+  priority     Priority  @default(MEDIA)
+  followUp     Boolean   @default(false)
+  followedAt   DateTime?
+  followedById String?
+  createdAt    DateTime  @default(now())
+  author       User      @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([createdAt, shift])
+  @@index([followUp, priority])
+}
