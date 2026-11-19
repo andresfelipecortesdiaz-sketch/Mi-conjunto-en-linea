@@ -1,60 +1,119 @@
 # Mi Conjunto en Línea
 
-Portal de gestión residencial para Altos del Parque: paquetes, reservas, PQRS y bitácora de turnos.
+## Sobre el proyecto
+
+Desarrollé este proyecto para el Caso B de la asignatura Metodología de Software Colaborativo de la Universidad Cooperativa de Colombia. La propuesta está pensada para Altos del Parque, un conjunto residencial de tres torres y 240 apartamentos.
+
+La idea es reunir en un solo lugar tareas que hoy pueden quedar repartidas entre cuadernos, mensajes y correos: registrar paquetes, organizar reservas de zonas comunes, hacer seguimiento a las PQRS y dejar novedades entre turnos de portería.
+
+**Eslogan:** “Que ningún paquete se pierda y ninguna reserva se cruce”.
+
+## Tecnologías
+
+Para construir la aplicación estoy usando:
+
+- Next.js y React para la aplicación web y sus rutas de servidor.
+- TypeScript para definir los tipos del proyecto.
+- Tailwind CSS para los estilos.
+- PostgreSQL como base de datos y Prisma como ORM.
+- Zod para validar los datos que recibe el servidor.
+- bcryptjs para guardar contraseñas como hashes.
+- Vitest para las pruebas unitarias iniciales.
+
+## Qué incluye
+
+En el código preparé estos módulos:
+
+- **Acceso por roles:** administradora, portero y residente, con sesión en cookie HTTP-only y permisos verificados en las rutas del servidor.
+- **Paquetería:** registro y consulta de paquetes, y registro de entregas a residentes o personas autorizadas.
+- **Reservas:** solicitud y gestión de espacios comunes, con validaciones de anticipación, capacidad, horario y solicitudes mensuales.
+- **PQRS:** radicación con número de seguimiento e historial de cambios.
+- **Bitácora:** registro de novedades de turno y seguimiento administrativo.
+- **Dashboard y reportes:** conteos consultados desde la base de datos y exportación mensual a CSV.
+
+También preparé un seed de desarrollo con tres torres, los 240 apartamentos, el salón social, la zona BBQ y una cuenta para cada rol.
+
+## Estado actual
+
+La interfaz y las rutas principales están implementadas. Hasta ahora pude validar el esquema de Prisma, ejecutar TypeScript, lint, tres pruebas unitarias y compilar la aplicación.
+
+Todavía no he podido conectar el proyecto a PostgreSQL en este entorno. Por eso no se han aplicado las migraciones ni se ha ejecutado el seed, y tampoco he podido probar los flujos completos contra una base de datos. La importación de residentes desde CSV y algunas herramientas administrativas también están pendientes. En consecuencia, todavía no considero esta versión lista para uso real o producción.
+
+En la [trazabilidad del proyecto](docs/TRAZABILIDAD.md) registro el avance de cada fase, las historias de usuario y las verificaciones realizadas.
 
 ## Requisitos
 
-- Node.js 20 o posterior y npm.
+- Node.js 20 o posterior.
+- npm.
 - PostgreSQL 15 o posterior.
-- Acceso al registro npm durante la instalación.
+- Acceso al registro de npm para instalar las dependencias.
 
-## Configuración
+## Instalación y ejecución
+
+Primero, crea la base de datos `mi_conjunto` en PostgreSQL. Después, desde la carpeta del proyecto, copia el archivo de variables de entorno y configura la conexión:
 
 ```powershell
 Copy-Item .env.example .env
-# Edite DATABASE_URL y SESSION_SECRET
+```
+
+En `.env`, configura `DATABASE_URL` con los datos de tu servidor PostgreSQL y establece un `SESSION_SECRET` aleatorio de al menos 32 caracteres. No compartas ni subas ese archivo al repositorio.
+
+Luego instala las dependencias, crea las tablas, carga los datos de demostración e inicia la aplicación:
+
+```powershell
 npm.cmd install
 npm.cmd run db:migrate
 npm.cmd run db:seed
 npm.cmd run dev
 ```
 
-Abra `http://localhost:3000`. Para compilar: `npm.cmd run build`; para ejecutar: `npm.cmd start`.
+Abre [http://localhost:3000](http://localhost:3000) en el navegador. Si todavía no tienes PostgreSQL configurado, puedes iniciar el servidor para revisar la página, pero no podrás iniciar sesión ni utilizar los módulos conectados a la base de datos.
 
-## Credenciales de demostración (solo desarrollo)
+## Cuentas de demostración
 
-Las tres cuentas se crean con contraseña `AltosDemo2026!`:
+El seed crea estas cuentas para desarrollo. Las tres usan la contraseña `AltosDemo2026!`:
 
-- Administradora: `admin@altos.test`
-- Portería: `porter@altos.test`
-- Residente: `resident@altos.test` (Torre 1, apartamento 101)
+| Rol | Correo | Ubicación |
+|---|---|---|
+| Administradora | `admin@altos.test` | — |
+| Portero | `porter@altos.test` | — |
+| Residente | `resident@altos.test` | Torre 1, apartamento 101 |
 
-Las contraseñas se guardan como hash bcrypt. Cambie/elimine estas cuentas antes de publicar o desplegar. Nunca use estas credenciales en producción.
+Las contraseñas se guardan como hashes bcrypt. Estas cuentas son solo para demostración: cámbialas o elimínalas antes de cualquier despliegue y nunca uses esas credenciales en producción.
 
-## Funciones implementadas en código
+## Comandos útiles
 
-- Sesiones firmadas en cookie HttpOnly y autorización por rol.
-- Paquetes, entregas con comprobación de residente/autorizado y aislamiento residencial.
-- Solicitud y gestión de reservas con comprobaciones de anticipación, capacidad, mensualidad y franja.
-- Radicado e historial de PQRS.
-- Bitácora de novedades y seguimiento.
-- Dashboard y reporte mensual CSV consultados desde PostgreSQL.
-- Seed de 3 torres, 240 apartamentos y dos áreas comunes.
+| Comando | Para qué lo uso |
+|---|---|
+| `npm.cmd run dev` | Iniciar el servidor de desarrollo |
+| `npm.cmd run build` | Generar la compilación de producción |
+| `npm.cmd start` | Ejecutar la compilación de producción |
+| `npm.cmd run db:generate` | Generar el cliente de Prisma |
+| `npm.cmd run db:migrate` | Aplicar migraciones en PostgreSQL |
+| `npm.cmd run db:seed` | Crear los datos de demostración |
+| `npm.cmd test` | Ejecutar las pruebas unitarias disponibles |
+| `npm.cmd run lint` | Revisar el estilo y errores comunes del código |
 
-## Estado de validación
+Uso `npm.cmd` en estos ejemplos porque es el comando compatible con la configuración de PowerShell de este entorno.
 
-La carpeta comenzó vacía. Lint, TypeScript, las pruebas unitarias y el build se ejecutaron correctamente. No se detectó PostgreSQL ni Docker, así que no se pudo aplicar la migración ni ejecutar el seed o las pruebas de integración/E2E. La versión no debe considerarse lista para producción. La importación CSV, la administración completa de residentes y varias vistas aún están pendientes. Consulte [trazabilidad](docs/TRAZABILIDAD.md).
+## Organización de carpetas
 
-`npm audit` detecta tres alertas altas en Prisma CLI (dependencia de desarrollo `prisma` 6.19.x y `deepmerge-ts`); npm ofrece corrección mediante Prisma 7, un cambio mayor que no se aplicó para evitar cambiar de versión mayor del ORM dentro de esta fase.
+```text
+src/app/                 páginas y rutas de la aplicación
+src/lib/                 conexión a Prisma, sesiones y validaciones
+prisma/schema.prisma     modelo de la base de datos
+prisma/migrations/       migraciones de PostgreSQL
+prisma/seed.ts           datos de demostración
+docs/                    arquitectura, reglas, pruebas y trazabilidad
+.github/                 plantilla para solicitudes de cambio
+```
 
-## Comandos previstos
+## Pruebas y seguridad
 
-`npm run dev`, `npm run build`, `npm run start`, `npm run db:migrate`, `npm run db:seed`, `npm test`.
+Las tres pruebas unitarias actuales cubren reglas básicas de anticipación de reservas, antigüedad de paquetes y límite mensual. Aún faltan pruebas de integración y de extremo a extremo con PostgreSQL.
 
-## Git
+La aplicación incluye controles iniciales de roles, validación de datos y protección de contraseñas. Antes de usarla con información real, falta revisar el aviso y consentimiento para el tratamiento de datos personales, la política de retención, respaldos, TLS y la gestión de sesiones para producción. La auditoría de dependencias también reporta alertas en Prisma CLI y `deepmerge-ts`; la corrección automática propuesta implica pasar a Prisma 7, lo cual requiere una migración aparte.
 
-Se inicializó un repositorio Git sin historial previo, en la rama `main`. No se creó ningún commit. Convención recomendada: `feat:`, `fix:`, `docs:`, `test:`. Usar `main`, `develop` y ramas de trabajo `feat/<tema>`. Plantilla de PR en `.github/pull_request_template.md`.
+## Trabajo en equipo y Git
 
-## Seguridad y privacidad
-
-No subir `.env`. La solución incluye controles iniciales, no una certificación de cumplimiento legal. Antes de producción deben revisarse el aviso y consentimiento de datos personales, retención, respaldo, TLS, rotación/revocación de sesiones, controles de acceso y seguridad.
+Preparé el repositorio en la rama `main` y una plantilla para solicitudes de cambio en `.github/pull_request_template.md`. Para organizar el trabajo propongo usar ramas `feat/<tema>` y commits con prefijos como `feat:`, `fix:`, `docs:` y `test:`. No he agregado commits ni atribuido revisiones a otras personas.
