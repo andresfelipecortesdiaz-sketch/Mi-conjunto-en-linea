@@ -10,6 +10,6 @@ Prisma define 13 entidades: `User`, `Tower`, `Apartment`, `ResidentProfile`, `Pa
 - `AuditLog` conserva evento, entidad, usuario, fecha y metadata JSON.
 - `ShiftNovelty` conserva autor, prioridad, turno y seguimiento.
 
-Enums controlan rol, estados y prioridad. Índices cubren consultas por apartamento/estado/fecha, reserva/franja/estado, usuario/fecha y PQRS/estado. El índice parcial `Reservation_one_approved_slot` está en la migración SQL de PostgreSQL.
+Enums controlan rol, estados y prioridad. Prisma los valida al acceder a SQLite. Índices cubren consultas por apartamento/estado/fecha, reserva/franja/estado, usuario/fecha y PQRS/estado. El índice parcial `Reservation_one_approved_slot` se agrega en la migración SQLite.
 
-Para aplicar migraciones, configurar `DATABASE_URL` y ejecutar `npm run db:migrate`.
+La conexión local está en `.env` como `DATABASE_URL="file:./dev.db"`; el archivo se crea dentro de `prisma/`. Para aplicar migraciones, ejecutar `npm.cmd run db:migrate`. La migración original de PostgreSQL se conserva en `prisma/postgresql-reference/` como referencia para la adaptación futura.

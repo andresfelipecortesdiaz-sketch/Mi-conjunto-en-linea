@@ -15,7 +15,7 @@ Para construir la aplicación estoy usando:
 - Next.js y React para la aplicación web y sus rutas de servidor.
 - TypeScript para definir los tipos del proyecto.
 - Tailwind CSS para los estilos.
-- PostgreSQL como base de datos y Prisma como ORM.
+- SQLite como base local (un archivo) y Prisma como ORM. Para esta versión ya no hace falta instalar un servidor de base de datos.
 - Zod para validar los datos que recibe el servidor.
 - bcryptjs para guardar contraseñas como hashes.
 - Vitest para las pruebas unitarias iniciales.
@@ -35,9 +35,9 @@ También preparé un seed de desarrollo con tres torres, los 240 apartamentos, e
 
 ## Estado actual
 
-La interfaz y las rutas principales están implementadas. Hasta ahora pude validar el esquema de Prisma, ejecutar TypeScript, lint, tres pruebas unitarias y compilar la aplicación.
+La interfaz y las rutas principales están implementadas. Para que se pueda probar sin instalar PostgreSQL, adapté la configuración local a SQLite. Ya apliqué la migración, cargué las cuentas de demostración y comprobé el inicio de sesión y el catálogo de torres, apartamentos y zonas. También pasan TypeScript, lint, tres pruebas unitarias y el build.
 
-Todavía no he podido conectar el proyecto a PostgreSQL en este entorno. Por eso no se han aplicado las migraciones ni se ha ejecutado el seed, y tampoco he podido probar los flujos completos contra una base de datos. La importación de residentes desde CSV y algunas herramientas administrativas también están pendientes. En consecuencia, todavía no considero esta versión lista para uso real o producción.
+El encargo original solicita PostgreSQL; SQLite es una adaptación para poder ejecutar y mostrar el proyecto localmente con rapidez. Si la entrega exige PostgreSQL, todavía habrá que volver a ese proveedor y probar la migración correspondiente. La importación de residentes desde CSV, algunas herramientas administrativas y las pruebas completas de los módulos siguen pendientes, así que aún no considero esta versión lista para uso real o producción.
 
 En la [trazabilidad del proyecto](docs/TRAZABILIDAD.md) registro el avance de cada fase, las historias de usuario y las verificaciones realizadas.
 
@@ -45,18 +45,17 @@ En la [trazabilidad del proyecto](docs/TRAZABILIDAD.md) registro el avance de ca
 
 - Node.js 20 o posterior.
 - npm.
-- PostgreSQL 15 o posterior.
 - Acceso al registro de npm para instalar las dependencias.
 
 ## Instalación y ejecución
 
-Primero, crea la base de datos `mi_conjunto` en PostgreSQL. Después, desde la carpeta del proyecto, copia el archivo de variables de entorno y configura la conexión:
+Desde la carpeta del proyecto, copia el archivo de variables de entorno:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-En `.env`, configura `DATABASE_URL` con los datos de tu servidor PostgreSQL y establece un `SESSION_SECRET` aleatorio de al menos 32 caracteres. No compartas ni subas ese archivo al repositorio.
+La configuración usa el archivo local `prisma/dev.db`; la migración lo crea por ti. En `.env`, cambia `SESSION_SECRET` por un valor aleatorio de al menos 32 caracteres. No compartas ni subas `.env` al repositorio.
 
 Luego instala las dependencias, crea las tablas, carga los datos de demostración e inicia la aplicación:
 
@@ -67,7 +66,7 @@ npm.cmd run db:seed
 npm.cmd run dev
 ```
 
-Abre [http://localhost:3000](http://localhost:3000) en el navegador. Si todavía no tienes PostgreSQL configurado, puedes iniciar el servidor para revisar la página, pero no podrás iniciar sesión ni utilizar los módulos conectados a la base de datos.
+Abre [http://localhost:3000](http://localhost:3000) en el navegador.
 
 ## Cuentas de demostración
 
@@ -89,7 +88,7 @@ Las contraseñas se guardan como hashes bcrypt. Estas cuentas son solo para demo
 | `npm.cmd run build` | Generar la compilación de producción |
 | `npm.cmd start` | Ejecutar la compilación de producción |
 | `npm.cmd run db:generate` | Generar el cliente de Prisma |
-| `npm.cmd run db:migrate` | Aplicar migraciones en PostgreSQL |
+| `npm.cmd run db:migrate` | Crear o actualizar la base local SQLite |
 | `npm.cmd run db:seed` | Crear los datos de demostración |
 | `npm.cmd test` | Ejecutar las pruebas unitarias disponibles |
 | `npm.cmd run lint` | Revisar el estilo y errores comunes del código |
@@ -102,15 +101,15 @@ Uso `npm.cmd` en estos ejemplos porque es el comando compatible con la configura
 src/app/                 páginas y rutas de la aplicación
 src/lib/                 conexión a Prisma, sesiones y validaciones
 prisma/schema.prisma     modelo de la base de datos
-prisma/migrations/       migraciones de PostgreSQL
-prisma/seed.ts           datos de demostración
+prisma/migrations/       migraciones de SQLite
+prisma/seed.mjs          datos de demostración
 docs/                    arquitectura, reglas, pruebas y trazabilidad
 .github/                 plantilla para solicitudes de cambio
 ```
 
 ## Pruebas y seguridad
 
-Las tres pruebas unitarias actuales cubren reglas básicas de anticipación de reservas, antigüedad de paquetes y límite mensual. Aún faltan pruebas de integración y de extremo a extremo con PostgreSQL.
+Las tres pruebas unitarias actuales cubren reglas básicas de anticipación de reservas, antigüedad de paquetes y límite mensual. Además, comprobé manualmente el login y el catálogo contra SQLite. Aún faltan pruebas automatizadas de integración y de extremo a extremo.
 
 La aplicación incluye controles iniciales de roles, validación de datos y protección de contraseñas. Antes de usarla con información real, falta revisar el aviso y consentimiento para el tratamiento de datos personales, la política de retención, respaldos, TLS y la gestión de sesiones para producción. La auditoría de dependencias también reporta alertas en Prisma CLI y `deepmerge-ts`; la corrección automática propuesta implica pasar a Prisma 7, lo cual requiere una migración aparte.
 

@@ -2,8 +2,8 @@
 
 ## Inicio
 
-1. Configure PostgreSQL local y cree la base `mi_conjunto`.
-2. Copie `.env.example` a `.env` y configure `DATABASE_URL` y un `SESSION_SECRET` aleatorio de 32 caracteres o más.
+1. Copie `.env.example` a `.env`. La ruta `file:./dev.db` crea una base SQLite local y no requiere instalar un servidor.
+2. Cambie `SESSION_SECRET` por un valor aleatorio de 32 caracteres o más.
 3. Instale dependencias con `npm.cmd install`.
 4. Ejecute `npm.cmd run db:migrate`, luego `npm.cmd run db:seed`.
 5. Inicie con `npm.cmd run dev` y abra `http://localhost:3000`.
@@ -22,4 +22,4 @@ En Paquetería consulte sus paquetes. En Reservas seleccione zona, fecha, horari
 
 Revise el dashboard, apruebe o rechace reservas (el rechazo pide motivo), responda PQRS y gestione seguimiento de novedades. Reportes permite elegir mes y exportar CSV.
 
-Esta versión sigue en desarrollo: migración y flujos descritos requieren instalación y validación de base de datos antes de uso operativo.
+Esta versión sigue en desarrollo. La base SQLite funciona para la demostración local, pero falta completar pruebas de los flujos. El enunciado original solicita PostgreSQL para la entrega final.

@@ -1,10 +1,10 @@
 # Casos de prueba
 
-Estos casos son el plan solicitado, no evidencia de ejecución. No se han ejecutado porque npm denegó acceso al registro y PostgreSQL no está disponible.
+Estos son los casos planeados. Ya ejecuté las tres pruebas unitarias de reglas y comprobé manualmente el inicio de sesión de administradora y el catálogo desde SQLite: respondió con 3 torres, 240 apartamentos y 2 zonas. Los demás casos siguen pendientes de automatización.
 
 | Área | Caso | Resultado esperado |
 |---|---|---|
-| Auth | Correo/clave válida | Cookie HttpOnly y perfil de rol |
+| Auth | Correo/clave válida | Cookie HttpOnly y perfil de rol — comprobación manual completada para administradora |
 | Auth | Clave incorrecta | 401 sin crear sesión |
 | Auth | Recurso sin sesión | 401 |
 | Auth | Rol no autorizado | 403 |
@@ -18,6 +18,6 @@ Estos casos son el plan solicitado, no evidencia de ejecución. No se han ejecut
 | Reserva | Dos aprobaciones simultáneas misma franja | Solo una confirmada por índice único |
 | PQRS | Crear y consultar | Radicado único e historial |
 | PQRS | Residente consulta ticket ajeno | No aparece en lista |
-| Reporte | Mes elegido y descarga CSV | Conteos y CSV desde PostgreSQL |
+| Reporte | Mes elegido y descarga CSV | Conteos y CSV desde la base SQLite |
 
 Faltan pruebas automatizadas unitarias, de integración y Playwright para materializar estos casos.

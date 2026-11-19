@@ -1,6 +1,6 @@
 # Reglas de negocio
 
-- **RN-B1:** una sola reserva aprobada por zona, fecha y franja; transacción más índice único parcial PostgreSQL.
+- **RN-B1:** una sola reserva aprobada por zona, fecha y franja; transacción más índice único parcial SQLite.
 - **RN-B2:** mínimo 48 horas entre solicitud y fecha reservada.
 - **RN-B3:** máximo una solicitud pendiente o aprobada por apartamento por mes.
 - **RN-B4:** entrega solo a residente del apartamento o persona autorizada activa.

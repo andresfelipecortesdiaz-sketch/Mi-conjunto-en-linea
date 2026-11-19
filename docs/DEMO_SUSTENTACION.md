@@ -15,4 +15,4 @@ Altos del Parque gestiona 240 apartamentos en tres torres. La solución concentr
 
 ## Evidencia
 
-No presentar capturas ni resultados de ejecución hasta tener PostgreSQL, dependencias y pruebas ejecutadas. La trazabilidad actual registra los pasos de construcción y bloqueos observados.
+Para la demostración local, ejecutar la aplicación con SQLite y las cuentas de seed. Ya comprobé manualmente el login de administradora y que el catálogo devuelve 3 torres, 240 apartamentos y 2 zonas comunes. No presentar esos resultados como pruebas E2E: aún falta automatizar los recorridos completos. El enunciado original pide PostgreSQL, por lo que se debe explicar que SQLite se usa como alternativa de desarrollo si se conserva ese cambio.

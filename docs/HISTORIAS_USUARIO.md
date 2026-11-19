@@ -1,6 +1,6 @@
 # Historias de usuario y estado
 
-Los identificadores y estados se registran en [TRAZABILIDAD.md](TRAZABILIDAD.md). La solicitud original detalla CON-03 a CON-09, CON-12 y CON-13; CON-01, CON-02, CON-10, CON-11 y CON-14 carecen de descripción funcional suficiente. Las historias detalladas están implementadas parcialmente en código, pendientes de instalación, base de datos y pruebas.
+Los identificadores y estados se registran en [TRAZABILIDAD.md](TRAZABILIDAD.md). La solicitud original detalla CON-03 a CON-09, CON-12 y CON-13; CON-01, CON-02, CON-10, CON-11 y CON-14 carecen de descripción funcional suficiente. El código principal está implementado parcialmente; SQLite ya está instalada y contiene el seed, aunque todavía faltan pruebas automatizadas de los flujos principales.
 
 ## Historias detalladas
 
